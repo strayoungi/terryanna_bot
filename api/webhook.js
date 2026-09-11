@@ -50,6 +50,38 @@ module.exports = async (req, res) => {
       )
     }
 
+    if (text.startsWith("/counter")) {
+        const parts = text.split(" ");
+        const dateInput = parts[1];
+
+        if (!dateInput) {
+            await bot.sendMessage(
+                chatId,
+                "Format: /counter YYYY-MM-DD"
+            );
+            return;
+        }
+
+        const startDate = new Date(`${dateInput}T00:00:00+07:00`);
+        const now = new Date();
+
+        if (isNaN(startDate.getTime())) {
+            await bot.sendMessage(chatId, "Tanggal tidak valid.");
+            return;
+        }
+
+        const diffMs = now.getTime() - startDate.getTime();
+
+        const diffDays = Math.floor(
+            diffMs / (1000 * 60 * 60 * 24)
+        );
+
+        await bot.sendMessage(
+            chatId,
+            `Sudah ${diffDays} hari sejak ${dateInput}.`
+        );
+    }
+
     return res.status(200).send("OK");
 
   } catch (error) {

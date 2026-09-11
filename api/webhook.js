@@ -28,7 +28,7 @@ module.exports = async (req, res) => {
     if (text === "/start") {
       await bot.sendMessage(
         chatId,
-        `Halo ${username}! 👋\nBot berhasil dijalankan.`
+        `Halo ${username}! dengan chat id ${chatId}!👋\nBot berhasil dijalankan.`
       );
     }
 

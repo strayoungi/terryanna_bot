@@ -1,0 +1,17 @@
+name: Daily Telegram Message
+
+on:
+  schedule:
+    - cron: "0 19 * * *"
+      timezone: "Asia/Jakarta"
+
+  workflow_dispatch:
+
+jobs:
+  send-message:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Call Vercel cron endpoint
+        run: |
+          curl --fail http://terryanna-bot.vercel.app/api/cron

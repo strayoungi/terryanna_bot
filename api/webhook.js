@@ -156,7 +156,44 @@ module.exports = async (req, res) => {
                 timeZone: "Asia/Jakarta"
             })}.`
         );
+    }
+
+    if (text === "/mynotes") {
+        const { data: notes, error } = await supabase
+            .from("notes")
+            .select("message, created_at")
+            .eq("chat_id", chatId)
+            .order("created_at", { ascending: false })
+
+        if (error) {
+            console.error("Supabase mynotes error:", error)
+
+            await bot.sendMessage(
+            chatId,
+            `Gagal mengambil catatan ❌\n${error.message}`
+            )
+            return
         }
+
+        if (!notes || notes.length === 0) {
+            await bot.sendMessage(
+            chatId,
+            "Kamu belum punya catatan."
+            )
+            return
+        }
+
+        const notesText = notes
+            .map((note, index) => {
+            return `${index + 1}. ${note.message}`
+            })
+            .join("\n")
+
+        await bot.sendMessage(
+            chatId,
+            `📝 Catatan kamu:\n\n${notesText}`
+        )
+    }
 
     return res.status(200).send("OK");
 

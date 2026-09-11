@@ -1,8 +1,7 @@
-const TelegramBot = require("node-telegram-bot-api");
+const TelegramBot = require("node-telegram-bot-api")
+const getRawBody = require("raw-body")
 
-const bot = new TelegramBot(
-  process.env.TELEGRAM_BOT_TOKEN
-);
+const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN)
 
 module.exports = async (req, res) => {
   if (req.method === "GET") {
@@ -14,7 +13,8 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const update = req.body;
+    const rawBody = await getRawBody(req)
+    const update = JSON.parse(rawBody.toString())
 
     if (!update.message) {
       return res.status(200).send("OK");
@@ -22,13 +22,13 @@ module.exports = async (req, res) => {
 
     const chatId = update.message.chat.id;
     const text = update.message.text || "";
-    const firstName =
-      update.message.from.first_name || "User";
+    const username =
+      update.message.from.first_name || update.message.from.username || "User";
 
     if (text === "/start") {
       await bot.sendMessage(
         chatId,
-        `Halo ${firstName}! 👋\nBot berhasil dijalankan.`
+        `Halo ${username}! 👋\nBot berhasil dijalankan.`
       );
     }
 

@@ -46,8 +46,8 @@ module.exports = async (req, res) => {
       const message = parts.slice(1).join(" ")
 
       await supabase.from("notes").insert({
-        chatId,
-        message
+        chat_id: chatId,
+        notes: message
       })
 
       await bot.sendMessage(

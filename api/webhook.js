@@ -161,7 +161,7 @@ module.exports = async (req, res) => {
     if (text === "/mynotes") {
         const { data: notes, error } = await supabase
             .from("notes")
-            .select("message, created_at")
+            .select("notes, created_at")
             .eq("chat_id", chatId)
             .order("created_at", { ascending: false })
 

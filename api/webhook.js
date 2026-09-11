@@ -44,6 +44,12 @@ module.exports = async (req, res) => {
       // Handle notes command
       const parts = update.message.text.split(" ")
       const message = parts.slice(1).join(" ")
+
+      await supabase.from("notes").insert({
+        chatId,
+        message
+      })
+
       await bot.sendMessage(
         chatId,
         `Catatan disimpan disimpan ✅\n "${message}"`
@@ -81,6 +87,76 @@ module.exports = async (req, res) => {
             `Sudah ${diffDays} hari sejak ${dateInput}.`
         );
     }
+
+    if (text.startsWith("/remind")) {
+        const parts = text.split(" ");
+
+        const duration = parts[1]; // 7d
+        const dateInput = parts[2]; // 2026-09-09
+
+        if (!duration || !dateInput) {
+            await bot.sendMessage(
+                chatId,
+                "Format: /remind 7d YYYY-MM-DD"
+            );
+            return;
+        }
+
+        const match = duration.match(/^(\d+)d$/);
+
+        if (!match) {
+            await bot.sendMessage(
+                chatId,
+                "Format durasi harus seperti 7d, 14d, 30d."
+            );
+            return;
+        }
+
+        const days = parseInt(match[1]);
+
+        const baseDate = new Date(`${dateInput}T19:00:00+07:00`);
+
+        if (isNaN(baseDate.getTime())) {
+            await bot.sendMessage(
+                chatId,
+                "Tanggal tidak valid."
+            );
+            return;
+        }
+
+        const remindDate = new Date(baseDate);
+
+        remindDate.setDate(
+            remindDate.getDate() + days
+        );
+
+        const { error } = await supabase
+            .from("reminders")
+            .insert({
+                chat_id: chatId,
+                message: `${days} hari sudah berlalu sejak ${dateInput}!`,
+                remind_at: remindDate.toISOString(),
+                sent: false
+            });
+
+        if (error) {
+            console.error(error);
+
+            await bot.sendMessage(
+                chatId,
+                "Gagal membuat reminder."
+            );
+
+            return;
+        }
+
+        await bot.sendMessage(
+                chatId,
+                `Reminder dibuat ✅\n\n${days} hari dari ${dateInput} jatuh pada ${remindDate.toLocaleDateString("id-ID", {
+                timeZone: "Asia/Jakarta"
+            })}.`
+        );
+        }
 
     return res.status(200).send("OK");
 

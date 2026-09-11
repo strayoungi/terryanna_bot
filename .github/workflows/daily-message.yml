@@ -3,7 +3,6 @@ name: Daily Telegram Message
 on:
   schedule:
     - cron: "*/5 * * * *"
-      timezone: "Asia/Jakarta"
 
   workflow_dispatch:
 

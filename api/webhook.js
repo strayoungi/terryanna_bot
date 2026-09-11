@@ -185,7 +185,7 @@ module.exports = async (req, res) => {
 
         const notesText = notes
             .map((note, index) => {
-            return `${index + 1}. ${note.message}`
+            return `${index + 1}. ${note.notes}`
             })
             .join("\n")
 

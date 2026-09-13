@@ -38,7 +38,7 @@ module.exports = async (req, res) => {
 
         await bot.sendMessage(
           chatId,
-          `Sweet surprise dari Aleyna💌\n\nKlik link ini ya:\n[lihat hadiah](${giftUrl})`
+          `Sweet surprise dari Aleyna💌\n\nKlik link ini ya:\n${giftUrl}`
         )
       }
 
@@ -64,7 +64,6 @@ module.exports = async (req, res) => {
         chatId,
         `Halo ${username}!👋\nCari apa nih disini?`,
         {
-            parse_mode: "MarkdownV2",
             reply_markup: {
                 inline_keyboard: [
                     [

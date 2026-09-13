@@ -38,7 +38,10 @@ module.exports = async (req, res) => {
 
         await bot.sendMessage(
           chatId,
-          `Sweet surprise dari Aleyna💌\n\nKlik link ini ya:\n${giftUrl}`
+          `Sweet surprise dari Aleyna💌\n\n<a href="${giftUrl}">klik di sini, sayang!</a>`,
+            {
+                parse_mode: "HTML"
+            }
         )
       }
 

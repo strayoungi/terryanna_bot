@@ -24,6 +24,27 @@ module.exports = async (req, res) => {
     const rawBody = await getRawBody(req)
     const update = JSON.parse(rawBody.toString())
 
+    if (update.callback_query) {
+      const callbackQuery = update.callback_query
+      const chatId = callbackQuery.message?.chat?.id
+      const data = callbackQuery.data
+
+      if (chatId && data === "gift1") {
+        await bot.answerCallbackQuery(callbackQuery.id, {
+          text: "Yeay, hadiahnya datang! 🎁"
+        })
+
+        const giftUrl = "https://puzzel.org/en/jigsaw/play?p=-P1QEuefMOmv0mT4gSBx"
+
+        await bot.sendMessage(
+          chatId,
+          `Sweet surprise dari Aleyna💌\n\nKlik link ini ya:\n[lihat hadiah](${giftUrl})`
+        )
+      }
+
+      return res.status(200).send("OK");
+    }
+
     if (!update.message) {
       return res.status(200).send("OK");
     }
@@ -34,9 +55,24 @@ module.exports = async (req, res) => {
       update.message.from.first_name || update.message.from.username || "User";
 
     if (text === "/start") {
+        await supabase.from("users").upsert({
+            chat_id: chatId,
+            username: username || null
+        });
+
       await bot.sendMessage(
         chatId,
-        `Halo ${username}! dengan chat id ${chatId}!👋\nBot berhasil dijalankan.`
+        `Halo ${username}!👋\nCari apa nih disini?`,
+        {
+            parse_mode: "MarkdownV2",
+            reply_markup: {
+                inline_keyboard: [
+                    [
+                        { text: "Gift dari Aleyna", callback_data: "gift1" }
+                    ]
+                ]
+            }
+        }
       );
     }
 

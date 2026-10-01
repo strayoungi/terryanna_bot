@@ -58,9 +58,12 @@ module.exports = async (req, res) => {
       update.message.from.first_name || update.message.from.username || "User";
 
     if (text === "/start") {
-        await supabase.from("users").upsert({
+        await supabase.from("bot_users").upsert({
             chat_id: chatId,
             username: username || null
+        },
+        {
+            onConflict: 'chat_id'
         });
 
       await bot.sendMessage(

@@ -88,12 +88,12 @@ module.exports = async (req, res) => {
 
       await supabase.from("notes").insert({
         chat_id: chatId,
-        notes: message
+        text: message
       })
 
       await bot.sendMessage(
         chatId,
-        `Catatan disimpan disimpan ✅\n "${message}"`
+        `Catatan disimpan ✅\n "${message}"`
       )
     }
 
@@ -202,7 +202,7 @@ module.exports = async (req, res) => {
     if (text === "/mynotes") {
         const { data: notes, error } = await supabase
             .from("notes")
-            .select("notes, created_at")
+            .select("text, created_at")
             .eq("chat_id", chatId)
             .order("created_at", { ascending: false })
 
@@ -226,7 +226,7 @@ module.exports = async (req, res) => {
 
         const notesText = notes
             .map((note, index) => {
-            return `${index + 1}. ${note.notes}`
+            return `${index + 1}. ${note.text}`
             })
             .join("\n")
 

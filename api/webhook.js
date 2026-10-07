@@ -29,19 +29,44 @@ module.exports = async (req, res) => {
       const chatId = callbackQuery.message?.chat?.id
       const data = callbackQuery.data
 
-      if (chatId && data === "gift1") {
+      if (chatId && data === "my_notes") {
         await bot.answerCallbackQuery(callbackQuery.id, {
-          text: "Yeay, hadiahnya datang! 🎁"
+          text: "Menampilkan catatan kamu..."
         })
 
-        const giftUrl = "https://puzzel.org/en/jigsaw/play?p=-P1QEuefMOmv0mT4gSBx"
+        const { data: notes, error } = await supabase
+            .from("notes")
+            .select("text, created_at")
+            .eq("chat_id", chatId)
+            .order("created_at", { ascending: false })
+
+        if (error) {
+            console.error("Supabase mynotes error:", error)
+
+            await bot.sendMessage(
+            chatId,
+            `Gagal mengambil catatan ❌\n${error.message}`
+            )
+            return
+        }
+
+        if (!notes || notes.length === 0) {
+            await bot.sendMessage(
+            chatId,
+            "Kamu belum punya catatan."
+            )
+            return
+        }
+
+        const notesText = notes
+            .map((note, index) => {
+            return `${index + 1}. ${note.text}`
+            })
+            .join("\n")
 
         await bot.sendMessage(
-          chatId,
-          `Sweet surprise dari Aleyna💌\n\n<a href="${giftUrl}">klik di sini, sayang!</a>`,
-            {
-                parse_mode: "HTML"
-            }
+            chatId,
+            `📝 Catatan kamu:\n\n${notesText}`
         )
       }
 
@@ -73,7 +98,7 @@ module.exports = async (req, res) => {
             reply_markup: {
                 inline_keyboard: [
                     [
-                        { text: "Gift dari Aleyna", callback_data: "gift1" }
+                        { text: "Liat Notes-ku", callback_data: "my_notes" }
                     ]
                 ]
             }
